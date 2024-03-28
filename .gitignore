@@ -1,0 +1,23 @@
+## Ignore File ##
+
+.cache/
+.conda/
+.config/
+.imageio/
+.ipython/
+.local/
+.nv/
+.pytorch_pretrained_bert/
+.vscode-server/
+.bash_history
+.bashrc
+.gitconfig
+.profile
+.python_history
+.viminfo
+.wget-hsts
+
+BAN-KVQA/data/
+Faster-R-CNN/ouput/
+ban/
+frcnn/

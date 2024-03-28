@@ -1,0 +1,167 @@
+Namespace(batch_size=1024, dataroot='data', epochs=20, finetune_q=False, gamma=8, input=None, model='ban', num_hid=512, on_do_q=False, op='', output='saved_models', q_emb='bertrnn', seed=1204)
+nParams=	20281170
+optim: adamax lr=0.0010, decay_step=2, decay_rate=0.25, grad_clip=0.25
+gradual warmup lr: 0.0005
+
+epoch 0, time: 540.27
+2024-01-03 03:55:21
+	train_loss: 9.21, norm: 20.7817, score: 37.47, confidence: 99.94
+	eval score: 55.68 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  1.90 2.65 2.71 2.61 2.75 2.91 2.89 2.92
+gradual warmup lr: 0.0010
+
+epoch 1, time: 529.66
+2024-01-03 04:04:14
+	train_loss: 0.94, norm: 0.9704, score: 57.64, confidence: 100.00
+	eval score: 62.63 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  1.73 2.34 2.09 2.24 2.34 2.49 2.51 2.40
+gradual warmup lr: 0.0015
+
+epoch 2, time: 527.57
+2024-01-03 04:13:04
+	train_loss: 0.83, norm: 0.7692, score: 64.02, confidence: 100.00
+	eval score: 64.91 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  1.72 2.31 2.05 2.24 2.22 2.55 2.42 2.39
+gradual warmup lr: 0.0020
+
+epoch 3, time: 529.50
+2024-01-03 04:21:56
+	train_loss: 0.77, norm: 0.6218, score: 67.44, confidence: 100.00
+	eval score: 66.18 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  1.90 2.20 2.00 2.18 2.18 2.50 2.37 2.41
+lr: 0.0020
+
+epoch 4, time: 531.37
+2024-01-03 04:30:51
+	train_loss: 0.72, norm: 0.5087, score: 70.54, confidence: 100.00
+	eval score: 67.49 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  1.94 2.38 2.07 2.32 2.28 2.57 2.43 2.51
+lr: 0.0020
+
+epoch 5, time: 528.11
+2024-01-03 04:39:42
+	train_loss: 0.68, norm: 0.4447, score: 72.84, confidence: 100.00
+	eval score: 67.87 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.11 2.46 2.15 2.42 2.43 2.71 2.57 2.71
+lr: 0.0020
+
+epoch 6, time: 530.34
+2024-01-03 04:48:35
+	train_loss: 0.65, norm: 0.4024, score: 74.57, confidence: 100.00
+	eval score: 68.09 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.00 2.37 2.02 2.33 2.30 2.60 2.44 2.61
+lr: 0.0020
+
+epoch 7, time: 529.86
+2024-01-03 04:57:28
+	train_loss: 0.62, norm: 0.3667, score: 75.85, confidence: 100.00
+	eval score: 68.41 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.15 2.49 2.15 2.44 2.44 2.69 2.56 2.81
+lr: 0.0020
+
+epoch 8, time: 526.19
+2024-01-03 05:06:17
+	train_loss: 0.61, norm: 0.3386, score: 76.80, confidence: 100.00
+	eval score: 68.59 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.13 2.40 2.06 2.36 2.39 2.63 2.49 2.71
+lr: 0.0020
+
+epoch 9, time: 532.79
+2024-01-03 05:15:13
+	train_loss: 0.59, norm: 0.3141, score: 77.48, confidence: 100.00
+	eval score: 68.58 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.13 2.44 2.12 2.36 2.35 2.65 2.50 2.74
+decreased lr: 0.0005
+
+epoch 10, time: 526.13
+2024-01-03 05:23:59
+	train_loss: 0.56, norm: 0.2629, score: 78.63, confidence: 100.00
+	eval score: 69.21 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.18 2.48 2.12 2.41 2.40 2.65 2.55 2.77
+lr: 0.0005
+
+epoch 11, time: 528.80
+2024-01-03 05:32:51
+	train_loss: 0.55, norm: 0.2549, score: 78.91, confidence: 100.00
+	eval score: 69.22 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.20 2.52 2.16 2.44 2.44 2.67 2.57 2.79
+decreased lr: 0.0001
+
+epoch 12, time: 528.10
+2024-01-03 05:41:42
+	train_loss: 0.54, norm: 0.2422, score: 79.13, confidence: 100.00
+	eval score: 69.30 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.19 2.50 2.14 2.43 2.43 2.66 2.55 2.78
+lr: 0.0001
+
+epoch 13, time: 529.13
+2024-01-03 05:50:35
+	train_loss: 0.54, norm: 0.2397, score: 79.17, confidence: 100.00
+	eval score: 69.29 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.21 2.52 2.15 2.44 2.44 2.67 2.56 2.79
+decreased lr: 0.0000
+
+epoch 14, time: 526.29
+2024-01-03 05:59:21
+	train_loss: 0.54, norm: 0.2371, score: 79.21, confidence: 100.00
+	eval score: 69.32 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.20 2.51 2.15 2.44 2.43 2.67 2.56 2.78
+lr: 0.0000
+
+epoch 15, time: 529.51
+2024-01-03 06:08:13
+	train_loss: 0.54, norm: 0.2350, score: 79.23, confidence: 100.00
+	eval score: 69.33 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.20 2.51 2.14 2.44 2.43 2.67 2.56 2.78
+decreased lr: 0.0000
+
+epoch 16, time: 529.87
+2024-01-03 06:17:07
+	train_loss: 0.53, norm: 0.2346, score: 79.23, confidence: 100.00
+	eval score: 69.34 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.20 2.51 2.15 2.44 2.43 2.67 2.56 2.78
+lr: 0.0000
+
+epoch 17, time: 524.64
+2024-01-03 06:25:54
+	train_loss: 0.53, norm: 0.2357, score: 79.22, confidence: 100.00
+	eval score: 69.34 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.19 2.51 2.15 2.44 2.43 2.67 2.56 2.78
+decreased lr: 0.0000
+
+epoch 18, time: 527.69
+2024-01-03 06:34:45
+	train_loss: 0.53, norm: 0.2349, score: 79.23, confidence: 100.00
+	eval score: 69.33 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.19 2.51 2.14 2.44 2.43 2.67 2.56 2.78
+lr: 0.0000
+
+epoch 19, time: 525.39
+2024-01-03 06:43:30
+	train_loss: 0.53, norm: 0.2342, score: 79.24, confidence: 100.00
+	eval score: 69.33 (23.79)
+	confidence: 100.00 (100.00)
+	entropy:  2.19 2.51 2.14 2.44 2.43 2.67 2.56 2.78
+
+Val upper bound: 0.23792662080900356
+
+Val score: 0.6934087372043577

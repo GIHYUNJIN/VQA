@@ -1,0 +1,193 @@
+"""
+This code is modified from Hengyuan Hu's repository.
+https://github.com/hengyuan-hu/bottom-up-attention-vqa
+
+Reads in a tsv file with pre-trained bottom up attention features 
+of the adaptive number of boxes and stores it in HDF5 format.  
+Also store {image_id: feature_idx} as a pickle file.
+
+Hierarchy of HDF5 file:
+
+{ 'image_features': num_boxes x 2048
+  'image_bb': num_boxes x 4
+  'spatial_features': num_boxes x 6
+  'pos_boxes': num_images x 2 }
+"""
+from __future__ import print_function
+
+import os
+import argparse
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import base64
+import csv
+import re
+import json
+import h5py
+import _pickle as cPickle
+import numpy as np
+import utils
+
+from tqdm import tqdm
+
+csv.field_size_limit(sys.maxsize)
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--num_gpu', type=int, default=4)
+    parser.add_argument('--dataroot', type=str, default='data/features')
+    args = parser.parse_args()
+    return args
+
+def extract(split, infiles):
+    FIELDNAMES = ['image_id', 'image_w', 'image_h', 'num_boxes', 'boxes', 'features']
+    question_file = {
+        'train': 'data/train_qa_anno.json',
+        'val': 'data/val_qa_anno.json',
+        'test': 'data/test_qa_anno.json'
+    }
+    data_file = {
+        'train': 'data/train_kvqa.hdf5',
+        'val': 'data/val_kvqa.hdf5',
+        'test': 'data/test_kvqa.hdf5'
+    }
+    indices_file = {
+        'train': 'data/train_imgid2idx.pkl',
+        'val': 'data/val_imgid2idx.pkl',
+        'test':'data/test_imgid2idx.pkl'
+    }
+    # change - ghjin
+    # known_num_boxes = {
+    #     'train': 1107790,
+    #     'val': 186135,
+    #     'test': 560211
+    # }
+    known_num_boxes = {
+        'train': 243306,
+        'val': 30414,
+        'test': 30414,}
+    feature_length = 2048
+    min_fixed_boxes = 10
+    max_fixed_boxes = 100
+
+    with open(question_file[split]) as f:
+        questions = json.load(f)
+    # change - ghjin
+    # split_imids = [os.path.splitext(q['image']) for q in questions]
+    split_imids = list(set([q['image_id'] for q in questions]))
+    
+    h = h5py.File(data_file[split], 'w')
+
+    if known_num_boxes[split] is None:
+        num_boxes = 0
+        for infile in infiles:
+            print("reading tsv...%s" % infile)
+            with open(infile, "r+") as tsv_in_file:
+                reader = csv.DictReader(tsv_in_file, delimiter='\t', fieldnames=FIELDNAMES)
+                for item in reader:
+                    print(item['num_boxes'])
+                    item['num_boxes'] = int(item['num_boxes'])
+                    image_id, _ = os.path.splitext(item['image_id'])
+                    if image_id in split_imids:
+                        num_boxes += item['num_boxes']
+    else:
+        num_boxes = known_num_boxes[split]
+
+    print('num_boxes=%d' % num_boxes)
+
+    img_features = h.create_dataset(
+        'image_features', (num_boxes, feature_length), 'f')
+    img_bb = h.create_dataset(
+        'image_bb', (num_boxes, 4), 'f')
+    spatial_img_features = h.create_dataset(
+        'spatial_features', (num_boxes, 6), 'f')
+    pos_boxes = h.create_dataset(
+        'pos_boxes', (len(split_imids), 2), dtype='int32')
+
+    counter = 0
+    num_boxes = 0
+    indices = {}
+
+    for infile in infiles:
+        print("reading tsv...%s" % infile)
+        with open(infile, "r+") as tsv_in_file:
+            reader = csv.DictReader(tsv_in_file, delimiter='\t', fieldnames=FIELDNAMES)
+            # append tqdm - ghjin
+            i = 0
+            for item in reader:
+                i = i + 1
+                image_id, _ = os.path.splitext(item['image_id'])
+                if image_id not in split_imids:
+                    continue
+                item['num_boxes'] = int(item['num_boxes'])
+                item['boxes'] = bytes(item['boxes'], 'utf')
+                item['features'] = bytes(item['features'], 'utf')
+                image_id, _ = os.path.splitext(item['image_id'])
+                image_w = float(item['image_w'])
+                image_h = float(item['image_h'])
+                if item['num_boxes'] != 0:
+                    bboxes = np.frombuffer(
+                        # base64.decodestring(item['boxes']),
+                        # dtype=np.float32).reshape((item['num_boxes'], -1))
+                        base64.decodestring(item['boxes'][2:-1]), # change - ghjin
+                        dtype=np.float64).reshape((item['num_boxes'], -1))
+
+                    box_width = bboxes[:, 2] - bboxes[:, 0]
+                    box_height = bboxes[:, 3] - bboxes[:, 1]
+                    scaled_width = box_width / image_w
+                    scaled_height = box_height / image_h
+                    scaled_x = bboxes[:, 0] / image_w
+                    scaled_y = bboxes[:, 1] / image_h
+
+                    box_width = box_width[..., np.newaxis]
+                    box_height = box_height[..., np.newaxis]
+                    scaled_width = scaled_width[..., np.newaxis]
+                    scaled_height = scaled_height[..., np.newaxis]
+                    scaled_x = scaled_x[..., np.newaxis]
+                    scaled_y = scaled_y[..., np.newaxis]
+
+                    spatial_features = np.concatenate(
+                        (scaled_x,
+                         scaled_y,
+                         scaled_x + scaled_width,
+                         scaled_y + scaled_height,
+                         scaled_width,
+                         scaled_height),
+                        axis=1)
+                else:
+                    bboxes = 0
+                    spatial_features = 0
+
+                indices[image_id] = counter
+                try:
+                    pos_boxes[counter,:] = np.array([num_boxes, num_boxes + item['num_boxes']])
+                    # if split == 'val':
+                    #     print(image_w, image_h)
+                except:
+                    print(item)
+                    break
+                #     pass
+                img_bb[num_boxes:num_boxes+item['num_boxes'], :] = bboxes
+                img_features[num_boxes:num_boxes+item['num_boxes'], :] = np.frombuffer(
+                    # base64.decodestring(item['features']),
+                    base64.decodestring(item['features'][2:-1]), # change - ghjin
+                    dtype=np.float32).reshape((item['num_boxes'], -1)) if item['num_boxes'] != 0 else 0
+                spatial_img_features[num_boxes:num_boxes+item['num_boxes'], :] = spatial_features
+                counter += 1
+                num_boxes += item['num_boxes']
+            
+    cPickle.dump(indices, open(indices_file[split], 'wb'))
+    h.close()
+    print("done!")
+
+if __name__ == '__main__':
+    args = parse_args()
+    infiles = []
+    
+    infiles.append(os.path.join(args.dataroot, 'faster-rcnn_train.tsv'))
+    infiles.append(os.path.join(args.dataroot, 'faster-rcnn_val.tsv'))
+    infiles.append(os.path.join(args.dataroot, 'faster-rcnn_test.tsv'))
+    extract('train', infiles)
+    extract('val', infiles)
+    extract('test', infiles)
